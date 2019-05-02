@@ -1,0 +1,37 @@
+{
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/my-test-api",
+        "run": {
+          "serviceId": "my-test-api",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "**",
+        "run": {
+          "serviceId": "cloud-run-login",
+          "region": "us-central1"
+        }
+      }
+    ]
+  }
+}

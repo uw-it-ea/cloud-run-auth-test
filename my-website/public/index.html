@@ -1,0 +1,63 @@
+<html lang="en">
+
+<head>
+  <meta name="google-signin-scope" content="profile email">
+  <meta name="google-signin-client_id"
+    content="68060519968-afeikidnpf26qqu8808pc26t6g6g9ek4.apps.googleusercontent.com">
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+</head>
+
+<body>
+  <div id="signin" class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+  <div><span>Name from JS authentication : </span><span id="name"></span></div>
+
+
+  <div id="api-response-container" class="display:none">
+    <div><span>my-api-response : </span> <span id="my-api-response"></span></div>
+    <div><span>my-picture : </span> <img id="my-api-response-picture"></img></div>
+  </div>
+  <div><a href="/unhauthenticated" target="_blank">unhauthenticated cloud run url</a></div>
+  <script>
+    function onSignIn(googleUser) {
+      // Useful data for your client-side scripts:
+      var profile = googleUser.getBasicProfile();
+      console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+      console.log('Full Name: ' + profile.getName());
+      console.log('Given Name: ' + profile.getGivenName());
+      console.log('Family Name: ' + profile.getFamilyName());
+      console.log("Image URL: " + profile.getImageUrl());
+      console.log("Email: " + profile.getEmail());
+
+      // The ID token you need to pass to your backend:
+      var id_token = googleUser.getAuthResponse().id_token;
+      console.log("ID Token: " + id_token);
+
+
+      document.getElementById("name").innerHTML = "logged in : " + profile.getName();
+      document.getElementById("signin").style.display = "none";
+
+
+      const myApiCall = new XMLHttpRequest();
+      const myApiUrl = '/my-test-api';
+
+      myApiCall.open("GET", myApiUrl);
+      myApiCall.withCredentials = true;
+      myApiCall.setRequestHeader("authorization", 'Bearer ' + id_token);
+      myApiCall.send();
+      myApiCall.onreadystatechange = (e) => {
+        if (myApiCall.readyState == 4 && myApiCall.status == 200) {
+          console.log(myApiCall.responseText)
+          var response = JSON.parse(myApiCall.responseText)
+          document.getElementById("my-api-response").innerHTML = '"' + myApiCall.responseText + '"';
+          document.getElementById("my-api-response-picture").src = response.picture
+
+
+          document.getElementById("api-response-container").style.display = "block";
+        }
+
+      }
+    }
+  </script>
+</body>
+
+</html>
