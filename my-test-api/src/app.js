@@ -1,6 +1,8 @@
 'use strict';
 
-const tracer = require('@google-cloud/trace-agent').start();
+const tracer = require('@google-cloud/trace-agent').start({
+  samplingRate: 5
+});
 const Firestore = require('@google-cloud/firestore');
 const express = require('express');
 
@@ -78,11 +80,8 @@ router.get('/', async (req, res) => {
     await document.set({
       email: authToken.email,
       lastLogin: Firestore.Timestamp.fromDate(new Date()),
-    },{merge: true});
-
-    await document.update({
       access_count: Firestore.FieldValue.increment(1)
-    });
+    }, { merge: true });
 
 
     res.type('application/json')
